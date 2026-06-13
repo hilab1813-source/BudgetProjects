@@ -88,10 +88,12 @@ def efficiency_rank(years):
 #  שכבה 3: התצוגה (הדשבורד עצמו)
 # ------------------------------------------------------------
 st.set_page_config(page_title="תקציב אוגדתי", page_icon="📊", layout="wide")
+
+# --- הזרקת CSS להפיכת הממשק לכיוון ימין-לשמאל (RTL) עבור עברית ---
 st.markdown("""
     <style>
     .stApp { direction: rtl; }
-    section[data-testid="stSidebar"] { direction: rtl; width: 300px !important; min-width: 300px !important; } }
+    section[data-testid="stSidebar"] { direction: rtl; }
     .stApp h1, .stApp h2, .stApp h3, .stApp p, .stApp label,
     .stApp div, .stApp span { text-align: right; }
     [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { direction: rtl; text-align: right; }
@@ -102,9 +104,14 @@ st.markdown("""
 st.title("📊 מערכת ניהול תקציב אוגדתי")
 st.caption("נתונים מפוברקים להדגמה · שנת עבודה 2026")
 
-# --- בורר מצב: עריכה או צפייה בלבד ---
-mode = st.sidebar.radio("מצב הפעלה:", ["צפייה בלבד (מפקדים)", "עריכה (הזנת נתונים)"])
+# --- בורר מצב: עריכה או צפייה בלבד (בראש הדף, לא ב-sidebar) ---
+mode = st.radio("מצב הפעלה:", ["צפייה בלבד (מפקדים)", "עריכה (הזנת נתונים)"],
+                horizontal=True)
 edit_mode = mode.startswith("עריכה")
+if edit_mode:
+    st.info("מצב עריכה — ניתן להוסיף יחידות (בתחתית הדף).")
+else:
+    st.info("מצב צפייה — הנתונים מוצגים לקריאה בלבד.")
 
 data = st.session_state.division_data
 
@@ -142,13 +149,23 @@ with tab1:
     df = pd.DataFrame(rows)
 
     # גרף עמודות: מתוכנן מול בפועל
+    # גרף עמודות מקובץ (Plotly) - תומך בעברית, תוויות אופקיות קריאות
     fig = go.Figure()
-    fig.add_trace(go.Bar(name="מתוכנן", x=df["קטגוריה"], y=df["מתוכנן"], marker_color="#85B7EB"))
-    fig.add_trace(go.Bar(name="בפועל", x=df["קטגוריה"], y=df["בפועל"], marker_color="#185FA5"))
-    fig.update_layout(barmode="group", font=dict(size=14), xaxis=dict(tickangle=0),
-                      legend=dict(orientation="h", y=1.1), height=400,
-                      plot_bgcolor="rgba(0,0,0,0)")
+    fig.add_trace(go.Bar(name="מתוכנן", x=df["קטגוריה"], y=df["מתוכנן"],
+                         marker_color="#85B7EB"))
+    fig.add_trace(go.Bar(name="בפועל", x=df["קטגוריה"], y=df["בפועל"],
+                         marker_color="#185FA5"))
+    fig.update_layout(
+        barmode="group",
+        font=dict(family="Arial", size=14),
+        xaxis=dict(tickangle=0),
+        legend=dict(x=1, xanchor="right", orientation="h", y=1.1),
+        margin=dict(t=40, b=40, l=20, r=20),
+        height=400,
+        plot_bgcolor="rgba(0,0,0,0)",
+    )
     st.plotly_chart(fig, use_container_width=True)
+
     # טבלה עם הדגשת חריגות
     def highlight(row):
         if row["סטטוס"] == "חריגה":
@@ -184,11 +201,11 @@ with tab3:
     rdf = pd.DataFrame(scored).sort_values("החזר (שנים)")
     st.dataframe(rdf, use_container_width=True, hide_index=True)
 
-# === הזנת נתונים (רק במצב עריכה) ===
+# === הזנת נתונים (רק במצב עריכה) - בתחתית הדף ===
 if edit_mode:
-    st.sidebar.divider()
-    st.sidebar.subheader("➕ הוספת יחידה")
-    with st.sidebar.form("add_unit"):
+    st.divider()
+    st.subheader("➕ הוספת יחידה")
+    with st.form("add_unit"):
         new_name = st.text_input("שם היחידה")
         new_vals = {}
         for c in categories:
@@ -201,5 +218,3 @@ if edit_mode:
             st.session_state.division_data[new_name] = new_vals
             st.success(f"היחידה '{new_name}' נוספה!")
             st.rerun()
-else:
-    st.sidebar.info("מצב צפייה — הנתונים מוצגים לקריאה בלבד.")
