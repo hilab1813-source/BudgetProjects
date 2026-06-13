@@ -91,7 +91,7 @@ st.set_page_config(page_title="תקציב אוגדתי", page_icon="📊", layou
 st.markdown("""
     <style>
     .stApp { direction: rtl; }
-    section[data-testid="stSidebar"] { direction: rtl; }
+    section[data-testid="stSidebar"] { direction: rtl; width: 300px !important; min-width: 300px !important; } }
     .stApp h1, .stApp h2, .stApp h3, .stApp p, .stApp label,
     .stApp div, .stApp span { text-align: right; }
     [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { direction: rtl; text-align: right; }
