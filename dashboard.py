@@ -9,6 +9,7 @@
 
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 
 # ------------------------------------------------------------
 #  שכבה 1: שכבת הנתונים
@@ -141,9 +142,13 @@ with tab1:
     df = pd.DataFrame(rows)
 
     # גרף עמודות: מתוכנן מול בפועל
-    chart_df = df.set_index("קטגוריה")[["מתוכנן", "בפועל"]]
-    st.bar_chart(chart_df)
-
+    fig = go.Figure()
+    fig.add_trace(go.Bar(name="מתוכנן", x=df["קטגוריה"], y=df["מתוכנן"], marker_color="#85B7EB"))
+    fig.add_trace(go.Bar(name="בפועל", x=df["קטגוריה"], y=df["בפועל"], marker_color="#185FA5"))
+    fig.update_layout(barmode="group", font=dict(size=14), xaxis=dict(tickangle=0),
+                      legend=dict(orientation="h", y=1.1), height=400,
+                      plot_bgcolor="rgba(0,0,0,0)")
+    st.plotly_chart(fig, use_container_width=True)
     # טבלה עם הדגשת חריגות
     def highlight(row):
         if row["סטטוס"] == "חריגה":
