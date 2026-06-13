@@ -87,6 +87,17 @@ def efficiency_rank(years):
 #  שכבה 3: התצוגה (הדשבורד עצמו)
 # ------------------------------------------------------------
 st.set_page_config(page_title="תקציב אוגדתי", page_icon="📊", layout="wide")
+st.markdown("""
+    <style>
+    .stApp { direction: rtl; }
+    section[data-testid="stSidebar"] { direction: rtl; }
+    .stApp h1, .stApp h2, .stApp h3, .stApp p, .stApp label,
+    .stApp div, .stApp span { text-align: right; }
+    [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { direction: rtl; text-align: right; }
+    .stDataFrame { direction: rtl; }
+    [data-baseweb="tab-list"] { direction: rtl; }
+    </style>
+""", unsafe_allow_html=True)
 st.title("📊 מערכת ניהול תקציב אוגדתי")
 st.caption("נתונים מפוברקים להדגמה · שנת עבודה 2026")
 
